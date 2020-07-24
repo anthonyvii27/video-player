@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IoIosPlay, IoIosPause } from 'react-icons/io';
-import { AiOutlineStepBackward, AiOutlineStepForward, AiOutlineExpand } from 'react-icons/ai';
+import { AiOutlineStepBackward, AiOutlineStepForward, AiOutlineExpand, AiFillSound } from 'react-icons/ai';
+import { BsVolumeUpFill, BsVolumeMuteFill } from 'react-icons/bs';
 
 import examples from '../../examples.json';
 
@@ -59,6 +60,8 @@ export default function PlayerVideo() {
 
   const [indexOfSearch, setIndexOfSearch] = useState((Math.random() * maxIndexOfSearch).toFixed(0));
 
+  const [isMuted, setIsMuted] = useState(false);
+
   useEffect(() => {
     setVideoURL(examples.categories[0].videos[parseFloat(indexOfSearch)].url);
     setVideoThumb(examples.categories[0].videos[parseFloat(indexOfSearch)].thumb);
@@ -70,6 +73,14 @@ export default function PlayerVideo() {
     handleTimeUpdate,
     handleChangeVideoPercentage
   } = usePlayerState(videoPlayer);
+
+  function setVolume() {
+    if(!isMuted) {
+      document.getElementById(videoPlayer.current.id).volume = 0;
+    } else {
+      document.getElementById(videoPlayer.current.id).volume = 1;
+    }
+  }
 
   return (
     <Container>
@@ -86,11 +97,20 @@ export default function PlayerVideo() {
           <OptionsButton onClick={toggleVideoPlay}>
             { playerState.playing ? <IoIosPause color="#FFF" size={25} title="Pause" /> : <IoIosPlay color="#FFF" size={25} title="Play" /> }
           </OptionsButton>
+
           <OptionsButton>
             <AiOutlineStepBackward color="#FFF" size={20} title="Previous" />
           </OptionsButton>
+
           <OptionsButton>
             <AiOutlineStepForward color="#FFF" size={20} title="Next" />
+          </OptionsButton>
+
+          <OptionsButton onClick={() => {
+            setIsMuted(prevState => !prevState)
+            setVolume()
+          }}>
+            { isMuted ? <BsVolumeMuteFill color="#FFF" size={22} title="Mute" /> : <BsVolumeUpFill color="#FFF" size={22} title="Mute" /> }
           </OptionsButton>
 
           <OptionsRangeVideo 
