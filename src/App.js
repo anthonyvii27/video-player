@@ -1,9 +1,10 @@
 import React from 'react';
+import PlayerVideo from './components/PlayerVideo';
 
-function App() {
+import './global.css';
+
+export default function App() {
   return (
-    <h1>Initial Project</h1>
+    <PlayerVideo />
   );
 }
-
-export default App;
