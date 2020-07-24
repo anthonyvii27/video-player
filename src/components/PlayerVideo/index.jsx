@@ -110,7 +110,7 @@ export default function PlayerVideo() {
             setIsMuted(prevState => !prevState)
             setVolume()
           }}>
-            { isMuted ? <BsVolumeMuteFill color="#FFF" size={22} title="Mute" /> : <BsVolumeUpFill color="#FFF" size={22} title="Mute" /> }
+            { isMuted ? <BsVolumeMuteFill color="#FFF" size={22} title={isMuted ? "Unmute" : "Mute"} /> : <BsVolumeUpFill color="#FFF" size={22} title="Mute" /> }
           </OptionsButton>
 
           <OptionsRangeVideo 
