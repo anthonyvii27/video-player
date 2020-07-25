@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IoIosPlay, IoIosPause } from 'react-icons/io';
-import { AiOutlineStepBackward, AiOutlineStepForward, AiOutlineExpand, AiFillSound } from 'react-icons/ai';
+import { AiOutlineStepBackward, AiOutlineStepForward, AiOutlineExpand } from 'react-icons/ai';
 import { BsVolumeUpFill, BsVolumeMuteFill } from 'react-icons/bs';
 
 import examples from '../../examples.json';
 
-import { Container, Player, OptionsBar, OptionsButton, OptionsRangeVideo } from './styles';
+import { Container, Player, TimeLabel, OptionsBar, OptionsButton, OptionsRangeVideo, TimeValue, Details } from './styles';
 
 function usePlayerState(videoPlayer) {
   const [playerState, setPlayerState] = useState({ playing: false, percentage: 0 });
@@ -51,20 +51,27 @@ function usePlayerState(videoPlayer) {
   }
 }
 
+
 export default function PlayerVideo() {
   const videoPlayer = useRef(null);
   const maxIndexOfSearch = examples.categories[0].videos.length - 1;
 
   const [videoURL, setVideoURL] = useState('');
   const [videoThumb, setVideoThumb] = useState('');
+  const [details, setDetails] = useState();
 
   const [indexOfSearch, setIndexOfSearch] = useState((Math.random() * maxIndexOfSearch).toFixed(0));
 
   const [isMuted, setIsMuted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setVideoURL(examples.categories[0].videos[parseFloat(indexOfSearch)].url);
     setVideoThumb(examples.categories[0].videos[parseFloat(indexOfSearch)].thumb);
+    setDetails({
+      title: examples.categories[0].videos[parseFloat(indexOfSearch)].title,
+      subtitle: examples.categories[0].videos[parseFloat(indexOfSearch)].subtitle
+    });
   }, [indexOfSearch]);
 
   const { 
@@ -82,9 +89,47 @@ export default function PlayerVideo() {
     }
   }
 
+  function addZero(value) {
+    return (value < 10) ? "0" + value : value;
+  }
+
+  function convertSecondsToTimestamp(seconds) {
+    const fullTimestamp =  addZero(parseInt((seconds / 3600) % 24)) + ":" +
+                           addZero(parseInt((seconds / 60) % 60)) + ":" + 
+                           addZero(parseInt((seconds) % 60));
+
+    const timestamp = fullTimestamp.split(':');
+
+    return (timestamp[0] === '00') ? timestamp[1].concat(':' + timestamp[2]) : fullTimestamp
+  }  
+
+  function previousVideo() {
+    if(parseFloat(indexOfSearch) > 0) {
+      if(playerState.playing === true) { toggleVideoPlay() }
+      setIsVisible(false);
+      setIndexOfSearch(prevState => parseInt(prevState) - 1);
+    }
+  }
+
+  function nextVideo() {
+    if(parseFloat(indexOfSearch) < maxIndexOfSearch) {
+      if(playerState.playing === true) { toggleVideoPlay() }
+      setIsVisible(false);
+      setIndexOfSearch(prevState => parseInt(prevState) + 1);
+    }
+  }
+
   return (
     <Container>
-      <Player size={{width: '800px', height: '705px'}}>
+      <Player size="800px">
+        {isVisible ?
+          <TimeLabel>
+            <TimeValue>
+              {convertSecondsToTimestamp(videoPlayer.current?.currentTime)} / {convertSecondsToTimestamp((videoPlayer.current?.duration))}
+            </TimeValue>  
+          </TimeLabel>
+        : ''}
+
         <video
           ref={videoPlayer}
           src={videoURL}
@@ -94,16 +139,19 @@ export default function PlayerVideo() {
         />
 
         <OptionsBar>
-          <OptionsButton onClick={toggleVideoPlay}>
+          <OptionsButton onClick={() => {
+            if(!isVisible) { setIsVisible(prevState => !prevState) }
+            toggleVideoPlay()
+          }}>
             { playerState.playing ? <IoIosPause color="#FFF" size={25} title="Pause" /> : <IoIosPlay color="#FFF" size={25} title="Play" /> }
           </OptionsButton>
 
           <OptionsButton>
-            <AiOutlineStepBackward color="#FFF" size={20} title="Previous" />
+            <AiOutlineStepBackward color="#FFF" size={20} title="Previous" onClick={previousVideo} />
           </OptionsButton>
 
           <OptionsButton>
-            <AiOutlineStepForward color="#FFF" size={20} title="Next" />
+            <AiOutlineStepForward color="#FFF" size={20} title="Next" onClick={nextVideo} />
           </OptionsButton>
 
           <OptionsButton onClick={() => {
@@ -125,6 +173,11 @@ export default function PlayerVideo() {
             <AiOutlineExpand color="#FFF" size={20} title="Fullscreen" />
           </OptionsButton>
         </OptionsBar>
+        
+        <Details>
+          <h1>{details?.title}</h1>
+          <h3>{details?.subtitle}</h3>
+        </Details>
       </Player>
     </Container>
   );
