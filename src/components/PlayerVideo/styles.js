@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  background: black;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,6 +17,14 @@ export const Player = styled.div`
   video {
     width: 100%;
     height: 430px;
+  }
+
+  .red {
+    background: #222;
+    padding: 10px;
+    z-index: 5;
+    border-radius: 5px;
+    visibility: hidden;
   }
 `
 
@@ -52,9 +60,14 @@ export const OptionsButton = styled.button`
   background: transparent;
 `
 
+export const OptionRangeValue = styled.input`
+  visibility: hidden;
+  z-index: 5;
+`
+
 export const OptionsRangeVideo = styled.input`
   width: 70%;
-  margin: 0 15px;
+  margin: 0 30px 0 5px; 
 `
 
 export const Details = styled.div`

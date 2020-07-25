@@ -17,3 +17,16 @@ button {
   border: none;
   outline: none;
 }
+
+input[type="range"] {
+  outline: none;
+  border: none;
+}
+
+input[type=range][orient=vertical] {
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  width: 8px;
+  height: 175px;
+  padding: 0 5px;
+}

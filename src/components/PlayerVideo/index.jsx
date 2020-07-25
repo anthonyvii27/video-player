@@ -5,7 +5,7 @@ import { BsVolumeUpFill, BsVolumeMuteFill } from 'react-icons/bs';
 
 import examples from '../../examples.json';
 
-import { Container, Player, TimeLabel, OptionsBar, OptionsButton, OptionsRangeVideo, TimeValue, Details } from './styles';
+import { Container, Player, TimeLabel, OptionsBar, OptionsButton, OptionRangeValue, OptionsRangeVideo, TimeValue, Details } from './styles';
 
 function usePlayerState(videoPlayer) {
   const [playerState, setPlayerState] = useState({ playing: false, percentage: 0 });
@@ -17,12 +17,14 @@ function usePlayerState(videoPlayer) {
     playerState.playing
   ]);
 
+
   function toggleVideoPlay() {
     setPlayerState({
       ...playerState,
       playing: !playerState.playing
     });
   }
+
 
   function handleTimeUpdate() {
     const currentPercentage = (videoPlayer.current.currentTime / videoPlayer.current.duration) * 100;
@@ -33,6 +35,7 @@ function usePlayerState(videoPlayer) {
     });
   }
 
+
   function handleChangeVideoPercentage(event) {
     const currentPercentageValue = event.target.value;
     videoPlayer.current.currentTime = videoPlayer.current.duration / 100 * currentPercentageValue;  
@@ -42,6 +45,7 @@ function usePlayerState(videoPlayer) {
       percentage: currentPercentageValue | 0
     });
   }
+
 
   return {
     playerState,
@@ -74,12 +78,14 @@ export default function PlayerVideo() {
     });
   }, [indexOfSearch]);
 
+
   const { 
     playerState,
     toggleVideoPlay,
     handleTimeUpdate,
     handleChangeVideoPercentage
   } = usePlayerState(videoPlayer);
+
 
   function setVolume() {
     if(!isMuted) {
@@ -89,9 +95,21 @@ export default function PlayerVideo() {
     }
   }
 
+  
+  function handleChangeAudioPercentage(volume) {
+    const newVolume = document.getElementById(videoPlayer.current.id).volume = (volume / 100)
+    if(newVolume === 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+    }
+  }
+
+
   function addZero(value) {
     return (value < 10) ? "0" + value : value;
   }
+
 
   function convertSecondsToTimestamp(seconds) {
     const fullTimestamp =  addZero(parseInt((seconds / 3600) % 24)) + ":" +
@@ -103,6 +121,7 @@ export default function PlayerVideo() {
     return (timestamp[0] === '00') ? timestamp[1].concat(':' + timestamp[2]) : fullTimestamp
   }  
 
+
   function previousVideo() {
     if(parseFloat(indexOfSearch) > 0) {
       if(playerState.playing === true) { toggleVideoPlay() }
@@ -111,6 +130,7 @@ export default function PlayerVideo() {
     }
   }
 
+
   function nextVideo() {
     if(parseFloat(indexOfSearch) < maxIndexOfSearch) {
       if(playerState.playing === true) { toggleVideoPlay() }
@@ -118,6 +138,7 @@ export default function PlayerVideo() {
       setIndexOfSearch(prevState => parseInt(prevState) + 1);
     }
   }
+
 
   return (
     <Container>
@@ -154,12 +175,45 @@ export default function PlayerVideo() {
             <AiOutlineStepForward color="#FFF" size={20} title="Next" onClick={nextVideo} />
           </OptionsButton>
 
-          <OptionsButton onClick={() => {
-            setIsMuted(prevState => !prevState)
-            setVolume()
-          }}>
+          <OptionsButton 
+            onMouseOver={() => {
+              document.getElementById('option-range-value').style.visibility = 'visible'
+              document.getElementById('red').style.visibility = 'visible'
+            }} 
+            onMouseOut={() => {
+              document.getElementById('option-range-value').style.visibility = 'hidden'
+              document.getElementById('red').style.visibility = 'hidden'
+            }}
+            onClick={() => {
+              setIsMuted(prevState => !prevState)
+              setVolume()  
+            }          
+          }>
             { isMuted ? <BsVolumeMuteFill color="#FFF" size={22} title={isMuted ? "Unmute" : "Mute"} /> : <BsVolumeUpFill color="#FFF" size={22} title="Mute" /> }
           </OptionsButton>
+
+          <div 
+            className="red" 
+            id="red" 
+            onMouseOver={() => {
+              document.getElementById('option-range-value').style.visibility = 'visible'
+              document.getElementById('red').style.visibility = 'visible'
+            }} 
+            onMouseOut={() => {
+              document.getElementById('option-range-value').style.visibility = 'hidden'
+              document.getElementById('red').style.visibility = 'hidden'
+            }
+          }>
+            <OptionRangeValue 
+              type="range"
+              min="0"
+              max="100"
+              id="option-range-value"
+              orient="vertical"              
+              onChange={e => handleChangeAudioPercentage(e.target.value)}
+              // value={playerState.percentage}
+            />
+          </div>
 
           <OptionsRangeVideo 
             type="range"
