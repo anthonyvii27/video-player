@@ -58,16 +58,16 @@ function usePlayerState(videoPlayer) {
 
 export default function PlayerVideo() {
   const videoPlayer = useRef(null);
+
   const maxIndexOfSearch = examples.categories[0].videos.length - 1;
+  const [indexOfSearch, setIndexOfSearch] = useState((Math.random() * maxIndexOfSearch).toFixed(0));
 
   const [videoURL, setVideoURL] = useState('');
   const [videoThumb, setVideoThumb] = useState('');
   const [details, setDetails] = useState();
-
-  const [indexOfSearch, setIndexOfSearch] = useState((Math.random() * maxIndexOfSearch).toFixed(0));
-
   const [isMuted, setIsMuted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  
 
   useEffect(() => {
     setVideoURL(examples.categories[0].videos[parseFloat(indexOfSearch)].url);
@@ -211,7 +211,6 @@ export default function PlayerVideo() {
               id="option-range-value"
               orient="vertical"              
               onChange={e => handleChangeAudioPercentage(e.target.value)}
-              // value={playerState.percentage}
             />
           </div>
 
